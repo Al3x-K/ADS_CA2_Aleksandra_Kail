@@ -55,5 +55,47 @@ public:
         return mapTree.get(searchKey).value;
     }
 
-   
+    BinaryTree<K> keySet() {
+        BinaryTree<K> keys;
+        auto arr = mapTree.toArray();
+        for (int i = 0; i < mapTree.count(); ++i) {
+            keys.add(arr[i].key);
+        }
+        delete[] arr;
+        return keys;
+    }
+
+    void put(const K& key, const V& value) {
+        Pair newPair(key, value);
+        try {
+            Pair& existing = mapTree.get(newPair);
+            existing.value = value; // Update value
+        }
+        catch (...) {
+            mapTree.add(newPair); // Add new entry
+            ++mapSize;
+        }
+    }
+
+    int size() const {
+        return mapSize;
+    }
+
+    bool removeKey(const K& key) {
+        Pair target(key, V{});
+        if (mapTree.remove(target)) {
+            --mapSize;
+            return true;
+        }
+        return false;
+    }
+
+    V& operator[](const K& key) {
+        try {
+            return get(key);
+        }
+        catch (...) {
+            throw logic_error("Key not found.");
+        }
+    }
 };
