@@ -1,2 +1,3 @@
 ﻿  ADS_CA2_Aleksandra_Kail.cpp
+C:\Users\Asus\source\repos\ADS_CA2_Aleksandra_Kail\BinaryTree.h(152,1): warning C4715: 'BinaryTree<TreeMap<int,std::basic_string<char,std::char_traits<char>,std::allocator<char> > >::Pair>::remove': not all control paths return a value
   ADS_CA2_Aleksandra_Kail.vcxproj -> C:\Users\Asus\source\repos\ADS_CA2_Aleksandra_Kail\x64\Debug\ADS_CA2_Aleksandra_Kail.exe
