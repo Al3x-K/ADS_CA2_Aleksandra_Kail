@@ -77,7 +77,7 @@ public:
         }
     }
 
-    int size() const {
+    int size() {
         return mapSize;
     }
 

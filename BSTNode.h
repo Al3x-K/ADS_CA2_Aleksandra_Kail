@@ -177,5 +177,3 @@ void BSTNode<T>::add(T& item)
 		}
 	}
 }
-
-#pragma once

@@ -1,53 +1,105 @@
-#include "TreeMap.h"
 #include <iostream>
 #include <string>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <unordered_map>
 
 using namespace std;
 
-void runTests() 
-{
-    TreeMap<int, string> testMap;
+struct Row {
+    int id;
+    string make;
+    string model;
+    int year; // Changed from 'production_year'
+    string vin; // Changed from 'VIN_number'
+};
 
-    // Test put() and size()
-    cout << "Adding entries..." << endl;
-    testMap.put(1, "One");
-    testMap.put(2, "Two");
-    testMap.put(3, "Three");
 
-    cout << "Size after adding entries: " << testMap.size() << endl;
+// Load data from the CSV file
+vector<Row> loadCSV(const string& filename) {
+    vector<Row> data;
+    ifstream file(filename);
+    if (!file.is_open()) {
+        cerr << "Error opening file." << endl;
+        return data;
+    }
 
-    // Test get() and operator[]
-    cout << "Value for key 1: " << testMap.get(1) << endl;
-    cout << "Value for key 2: " << testMap[2] << endl;
+    string line;
+    getline(file, line); // Skip header
+    while (getline(file, line)) {
+        stringstream ss(line);
+        string token;
+        Row row;
 
-    // Test containsKey()
-    cout << "Contains key 2: " << (testMap.containsKey(2) ? "Yes" : "No") << endl;
-    cout << "Contains key 4: " << (testMap.containsKey(4) ? "Yes" : "No") << endl;
+        getline(ss, token, ','); row.id = stoi(token);
+        getline(ss, row.make, ',');
+        getline(ss, row.model, ',');
+        getline(ss, token, ','); row.year = stoi(token);
+        getline(ss, row.vin, ',');
 
-    // Test remove()
-    cout << "Removing key 2..." << endl;
-    bool removed = testMap.removeKey(2);
-    cout << "Key 2 removed: " << (removed ? "Yes" : "No") << endl;
-
-    // Verify size and contents after removal
-    cout << "Size after removal: " << testMap.size() << endl;
-    cout << "Contains key 2 after removal: " << (testMap.containsKey(2) ? "Yes" : "No") << endl;
-
-    // Test keySet()
-    cout << "Keys in the map: ";
-    BinaryTree<int> keys = testMap.keySet();
-    keys.printInOrder();
-
-    // Test clear()
-    cout << "Clearing map..." << endl;
-    testMap.clear();
-    cout << "Size after clearing: " << testMap.size() << endl;
-    cout << "Contains key 1 after clearing: " << (testMap.containsKey(1) ? "Yes" : "No") << endl;
+        data.push_back(row);
+    }
+    return data;
 }
 
-int main() 
-{
-    cout << "Running TreeMap tests..." << endl;
-    runTests();
+// Create an index based on a specified field
+void createIndex(const vector<Row>& data, const string& field) {
+    unordered_map<string, vector<Row>> index;
+
+    for (const auto& row : data) {
+        string key;
+        if (field == "Make") key = row.make;
+        else if (field == "Model") key = row.model;
+        else if (field == "Year") key = to_string(row.year);
+
+        index[key].push_back(row);
+    }
+
+    // Replace structured binding with iterator-based loop
+    for (auto it = index.begin(); it != index.end(); ++it) {
+        const string& key = it->first;
+        const vector<Row>& rows = it->second;
+
+        cout << key << ": " << rows.size() << " rows" << endl;
+    }
+}
+
+// Search for entries based on a field and a value
+void searchByField(const vector<Row>& data, const string& field, const string& value) {
+    for (const auto& row : data) {
+        if ((field == "Make" && row.make == value) ||
+            (field == "Model" && row.model == value) ||
+            (field == "Year" && to_string(row.year) == value) ||
+            (field == "VIN" && row.vin == value)) {
+            cout << "ID: " << row.id << ", Make: " << row.make
+                << ", Model: " << row.model << ", Year: " << row.year
+                << ", VIN: " << row.vin << endl;
+        }
+    }
+}
+
+int main() {
+    string filename = "data.csv";
+    auto data = loadCSV(filename);
+
+    if (data.empty()) {
+        cout << "No data loaded from file. Exiting." << endl;
+        return 1;
+    }
+
+    cout << "Choose an index field (Make/Model/Year): ";
+    string field;
+    cin >> field;
+
+    createIndex(data, field);
+
+    cout << "Enter value to search: ";
+    string value;
+    cin.ignore(); // Clear input buffer
+    getline(cin, value);
+
+    searchByField(data, field, value);
+
     return 0;
 }
