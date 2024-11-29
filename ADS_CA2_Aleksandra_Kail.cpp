@@ -17,7 +17,7 @@ struct Row {
 
 
 // Load data from the CSV file
-vector<Row> loadCSV(const string& filename) {
+static vector<Row> loadCSV(const string& filename) {
     vector<Row> data;
     ifstream file(filename);
     if (!file.is_open()) {
@@ -44,7 +44,7 @@ vector<Row> loadCSV(const string& filename) {
 }
 
 // Create an index based on a specified field
-void createIndex(const vector<Row>& data, const string& field) {
+static void createIndex(const vector<Row>& data, const string& field) {
     unordered_map<string, vector<Row>> index;
 
     for (const auto& row : data) {
@@ -66,7 +66,7 @@ void createIndex(const vector<Row>& data, const string& field) {
 }
 
 // Search for entries based on a field and a value
-void searchByField(const vector<Row>& data, const string& field, const string& value) {
+static void searchByField(const vector<Row>& data, const string& field, const string& value) {
     for (const auto& row : data) {
         if ((field == "Make" && row.make == value) ||
             (field == "Model" && row.model == value) ||
