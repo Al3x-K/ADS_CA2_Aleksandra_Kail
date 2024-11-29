@@ -182,9 +182,41 @@ void mainOrganizeUniqueWords()
     displayWordMap(wordMap);
 }
 
-int main() 
-{
-	mainOrganizeUniqueWords();
-	//mainUserSearch();
-	return 0;
+void displayMenu() {
+    cout << "\nPlease choose an option:\n";
+    cout << "1. Organize unique words by their first letter\n";
+    cout << "2. Search the dataset by a specific field\n";
+    cout << "0. Exit\n";
+    cout << "Enter your choice: ";
+}
+
+int main() {
+    int choice;
+
+    do {
+        displayMenu();
+        cin >> choice;
+
+        switch (choice) {
+        case 1:
+            cout << "\nOrganizing unique words by their first letter...\n";
+            mainOrganizeUniqueWords();
+            break;
+
+        case 2:
+            cout << "\nSearching the dataset...\n";
+            mainUserSearch();
+            break;
+
+        case 0:
+            cout << "Exiting the program. Goodbye!\n";
+            break;
+
+        default:
+            cout << "Invalid choice. Please try again.\n";
+        }
+
+    } while (choice != 0);
+
+    return 0;
 }
