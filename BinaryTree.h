@@ -1,5 +1,6 @@
 #pragma once
 #include "BSTNode.h"
+#include <functional>
 
 #include <vector>
 template <class T>
@@ -23,6 +24,10 @@ public:
 	void printPreOrder(BSTNode<T>* node);
 	void printPostOrder();
 	void printPostOrder(BSTNode<T>* node);
+	void printInOrderWithCustomOutput(function<void(const T&)> printItem);
+	void printInOrderWithCustomOutput(BSTNode<T>* node, function<void(const T&)> printItem);
+	
+	
 	T* toArray();
 	~BinaryTree();
 };
@@ -264,3 +269,18 @@ void BinaryTree<T>::printPostOrder(BSTNode<T>* node)
 		cout << node->getItem() << " ";
 	}
 }
+
+template<class T>
+void BinaryTree<T>::printInOrderWithCustomOutput(function<void(const T&)> printItem) {
+	this->printInOrderWithCustomOutput(root, printItem);
+}
+
+template<class T>
+void BinaryTree<T>::printInOrderWithCustomOutput(BSTNode<T>* node, function<void(const T&)> printItem) {
+	if (node != nullptr) {
+		printInOrderWithCustomOutput(node->getLeft(), printItem);
+		printItem(node->getItem()); // Call the custom print function
+		printInOrderWithCustomOutput(node->getRight(), printItem);
+	}
+}
+

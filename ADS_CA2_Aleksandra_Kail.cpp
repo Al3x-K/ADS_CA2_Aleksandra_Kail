@@ -4,6 +4,8 @@
 #include <sstream>
 #include <vector>
 #include <unordered_map>
+#include <set>
+#include "TreeMap.h"
 
 using namespace std;
 
@@ -79,13 +81,13 @@ static void searchByField(const vector<Row>& data, const string& field, const st
     }
 }
 
-int main() {
+void mainUserSearch() {
     string filename = "data.csv";
     auto data = loadCSV(filename);
 
     if (data.empty()) {
         cout << "No data loaded from file. Exiting." << endl;
-        return 1;
+        return;
     }
 
     cout << "Choose an index field (Make/Model/Year): ";
@@ -101,5 +103,88 @@ int main() {
 
     searchByField(data, field, value);
 
-    return 0;
+}
+
+
+// Function to process the file and populate the TreeMap
+void processFile(const string& filename, TreeMap<char, BinaryTree<string>>& wordMap) {
+    ifstream file(filename);
+    if (!file.is_open()) {
+        cerr << "Error: Could not open the file \"" << filename << "\"." << endl;
+        return;
+    }
+
+    string line, token;
+    getline(file, line); // Skip the header row
+
+    while (getline(file, line)) {
+        stringstream ss(line);
+        Row row;
+
+        // Read fields into the Row struct
+        getline(ss, token, ','); row.id = stoi(token);
+        getline(ss, row.make, ','); // Process only the "make" field
+
+        // Normalize the "make" field
+        string normalizedMake;
+        for (char c : row.make) {
+            if (isalnum(c)) {
+                normalizedMake += tolower(c);
+            }
+        }
+
+        if (normalizedMake.empty()) continue;
+
+        // Get the first letter
+        char firstLetter = normalizedMake[0];
+
+        // Add the make to the appropriate BinaryTree in the TreeMap
+        if (!wordMap.containsKey(firstLetter)) {
+            BinaryTree<string> newTree;
+            newTree.add(normalizedMake);
+            wordMap.put(firstLetter, newTree);
+        }
+        else {
+            wordMap.get(firstLetter).add(normalizedMake);
+        }
+    }
+
+    file.close();
+}
+
+// Function to display the organized makes
+void displayWordMap(TreeMap<char, BinaryTree<string>>& wordMap) {
+    BinaryTree<char> keys = wordMap.keySet();
+    auto letters = keys.toArray();
+
+    cout << "\nMakes organized by first letter:\n";
+    cout << endl;
+    for (int i = 0; i < wordMap.size(); ++i) {
+        char letter = letters[i];
+        cout << letter << ": ";
+        wordMap.get(letter).printInOrderWithCustomOutput([](const string& make) {
+            cout << make << " ";
+            });
+        cout << endl;
+    }
+    delete[] letters;
+}
+
+
+void mainOrganizeUniqueWords()
+{
+    TreeMap<char, BinaryTree<string>> wordMap;
+    string filename = "data.csv";
+    // Process the file to populate the TreeMap
+    processFile(filename, wordMap);
+
+    // Display the organized makes
+    displayWordMap(wordMap);
+}
+
+int main() 
+{
+	mainOrganizeUniqueWords();
+	//mainUserSearch();
+	return 0;
 }
